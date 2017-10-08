@@ -12,9 +12,10 @@ const ScrapStorage = require('scrap-storage')
 const scrapStorage = new scrapStorage('daiiz')
 
 // save text data to Scrapbox page
-// `key` means an unique pageName
+// Open the page written given lines data in a new browser tab
 const data = ['[hello]', 'world', '#scrapbox']
 scrapStorage.lines.put({
+  // `key` means an unique pageName
   key: 'HelloWorld',
   lines: data,
   metas: []
