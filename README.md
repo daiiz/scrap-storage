@@ -8,12 +8,12 @@ Save text data to Scrapbox
 ```js
 const ScrapStorage = require('scrap-storage')
 
-// set Scrapbox projectName
-const scrapStorage = new scrapStorage('daiiz')
+// Set Scrapbox projectName
+const scrapStorage = new ScrapStorage('daiiz')
 
-// save text data to Scrapbox page
-// Open the page written given lines data in a new browser tab
+// Save text data to Scrapbox page
 const data = ['[hello]', 'world', '#scrapbox']
+// Open the page written given lines data in a new browser tab
 scrapStorage.lines.put({
   // `key` means an unique pageName
   key: 'HelloWorld',
@@ -21,6 +21,6 @@ scrapStorage.lines.put({
   metas: []
 })
 
-// get text data from Scrapbox page
+// Get text data from Scrapbox page
 const lines = await scrapStorage.lines.get('HelloWorld')
 ```
