@@ -26,7 +26,9 @@ var ScrapStorage = function () {
     this.scrapboxUrl = 'https://scrapbox.io';
 
     this.lines = {
-      put: this.putLine,
+      put: function put(args) {
+        return _this.putLine(args);
+      },
       get: function get(args) {
         return _this.getLines(args);
       }

@@ -6,7 +6,7 @@ export default class ScrapStorage {
     this.scrapboxUrl = 'https://scrapbox.io'
 
     this.lines = {
-      put: this.putLine,
+      put: args => this.putLine(args),
       get: args => this.getLines(args)
     }
     this.entity = {
