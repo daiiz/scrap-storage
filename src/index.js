@@ -7,11 +7,8 @@ export default class ScrapStorage {
 
     this.lines = {
       put: args => this.putLine(args),
-      get: args => this.getLines(args)
-    }
-    this.entity = {
-      put: this.putEntity,
-      get: this.getEntity
+      get: args => this.getLines(args),
+      getMeta: args => this.getLinesMeta(args)
     }
   }
 
@@ -25,6 +22,17 @@ export default class ScrapStorage {
     return `${this.scrapboxUrl}/api/pages/${this.projectName}/${pageName}`
   }
 
+  async _fetchRawLines (pageTitle) {
+    if (!pageTitle) return []
+    const apiEndpoint = this._getPageAPIEndpoint(pageTitle)
+    if (!apiEndpoint) return []
+    const res = await request.get(apiEndpoint)
+    if (!res.body || !res.body.lines || res.body.lines <= 0) return []
+    // title行を除外
+    const lines = res.body.lines.slice(1)
+    return lines
+  } 
+
   putLine ({ key, lines, metas }) {
     const projectUrl = this._getProjectUrl()
     const pageTitle = key
@@ -37,13 +45,7 @@ export default class ScrapStorage {
   }
 
   async getLines ({ key }) {
-    const pageTitle = key
-    const apiEndpoint = this._getPageAPIEndpoint(pageTitle)
-    if (!apiEndpoint) return []
-    const res = await request.get(apiEndpoint)
-    if (!res.body || !res.body.lines || res.body.lines <= 0) return []
-    // title行を除外
-    const lines = res.body.lines.slice(1)
+    const lines = await this._fetchRawLines(key)
     const lineTexts = []
     for (let line of lines) {
       const text = line.text
@@ -55,10 +57,20 @@ export default class ScrapStorage {
     return lineTexts
   }
 
-  putEntity ({key, item}) {
-  }
-
-  getEntity ({key}) {
-    return {}
+  async getLinesMeta ({ key }) {
+    const lines = await this._fetchRawLines(key)
+    const metaTexts = []
+    let isMetaLine = false
+    for (let line of lines) {
+      const text = line.text
+      if (text.trim() === '[hr.icon]') {
+        isMetaLine = true
+        continue
+      }
+      if (text.length === 0) continue
+      if (!isMetaLine) continue
+      lineTexts.push(text)
+    }
+    return lineTexts
   }
 }

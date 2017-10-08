@@ -31,11 +31,10 @@ var ScrapStorage = function () {
       },
       get: function get(args) {
         return _this.getLines(args);
+      },
+      getMeta: function getMeta(args) {
+        return _this.getLinesMeta(args);
       }
-    };
-    this.entity = {
-      put: this.putEntity,
-      get: this.getEntity
     };
   }
 
@@ -50,6 +49,18 @@ var ScrapStorage = function () {
     value: function _getPageAPIEndpoint(pageName) {
       if (!this.projectName || !pageName) return null;
       return this.scrapboxUrl + '/api/pages/' + this.projectName + '/' + pageName;
+    }
+  }, {
+    key: '_fetchRawLines',
+    value: async function _fetchRawLines(pageTitle) {
+      if (!pageTitle) return [];
+      var apiEndpoint = this._getPageAPIEndpoint(pageTitle);
+      if (!apiEndpoint) return [];
+      var res = await _superagent2.default.get(apiEndpoint);
+      if (!res.body || !res.body.lines || res.body.lines <= 0) return [];
+      // title行を除外
+      var lines = res.body.lines.slice(1);
+      return lines;
     }
   }, {
     key: 'putLine',
@@ -72,13 +83,7 @@ var ScrapStorage = function () {
     value: async function getLines(_ref2) {
       var key = _ref2.key;
 
-      var pageTitle = key;
-      var apiEndpoint = this._getPageAPIEndpoint(pageTitle);
-      if (!apiEndpoint) return [];
-      var res = await _superagent2.default.get(apiEndpoint);
-      if (!res.body || !res.body.lines || res.body.lines <= 0) return [];
-      // title行を除外
-      var lines = res.body.lines.slice(1);
+      var lines = await this._fetchRawLines(key);
       var lineTexts = [];
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
@@ -112,17 +117,46 @@ var ScrapStorage = function () {
       return lineTexts;
     }
   }, {
-    key: 'putEntity',
-    value: function putEntity(_ref3) {
-      var key = _ref3.key,
-          item = _ref3.item;
-    }
-  }, {
-    key: 'getEntity',
-    value: function getEntity(_ref4) {
-      var key = _ref4.key;
+    key: 'getLinesMeta',
+    value: async function getLinesMeta(_ref3) {
+      var key = _ref3.key;
 
-      return {};
+      var lines = await this._fetchRawLines(key);
+      var metaTexts = [];
+      var isMetaLine = false;
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = lines[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var line = _step2.value;
+
+          var text = line.text;
+          if (text.trim() === '[hr.icon]') {
+            isMetaLine = true;
+            continue;
+          }
+          if (text.length === 0) continue;
+          if (!isMetaLine) continue;
+          lineTexts.push(text);
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      return lineTexts;
     }
   }]);
 
