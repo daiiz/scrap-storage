@@ -38,7 +38,7 @@ export default class ScrapStorage {
     const pageTitle = key
     if (!projectUrl) return []
     let body = lines.join('\n')
-    if (metas && metas.length > 0) body += `[hr.icon]\n${metas.join('\n')}`
+    if (metas && metas.length > 0) body += `\n[hr.icon]\n${metas.join('\n')}`
     body = window.encodeURIComponent(body)
     const scrapboxPageUrl = `${projectUrl}/${pageTitle}?body=${body}`
     window.open(scrapboxPageUrl)

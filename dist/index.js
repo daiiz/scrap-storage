@@ -73,7 +73,7 @@ var ScrapStorage = function () {
       var pageTitle = key;
       if (!projectUrl) return [];
       var body = lines.join('\n');
-      if (metas && metas.length > 0) body += '[hr.icon]\n' + metas.join('\n');
+      if (metas && metas.length > 0) body += '\n[hr.icon]\n' + metas.join('\n');
       body = window.encodeURIComponent(body);
       var scrapboxPageUrl = projectUrl + '/' + pageTitle + '?body=' + body;
       window.open(scrapboxPageUrl);
